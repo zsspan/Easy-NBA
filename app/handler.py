@@ -18,7 +18,6 @@ from .similarity import get_closest_player
 def handle_player_data(user_input) -> tuple:
     player_lower = user_input.lower()
     player_obj = get_player_object(player_lower)
-
     # player already in DB, READ
     if player_obj:
         print("Player is already in the database")

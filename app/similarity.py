@@ -127,8 +127,8 @@ def closest_player_KNN(scaled_df, player_id):
 def get_closest_player(id: int) -> str:
     """Returns the closest player name to player with given id."""
     try:
-        # scaled = scale_data(create_master_table())
         scaled = scale_data(create_master_table2())
+        # scaled = scale_data(create_master_table())
         
         closest_ids = closest_player_KNN(scaled, id)
         closest_names = [get_player_name(player_id) for player_id in closest_ids]
