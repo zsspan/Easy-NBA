@@ -1,11 +1,13 @@
+let players = [];
+
 document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("bar-container");
 
-    // Get data from data attributes
+    // get data from data attributes
     const player1Stats = JSON.parse(container.getAttribute("data-player1-stats"));
     const player2Stats = JSON.parse(container.getAttribute("data-player2-stats"));
 
-    const players = [container.getAttribute("data-player1-name"), 
+    players = [container.getAttribute("data-player1-name"), 
         container.getAttribute("data-player2-name")];
 
     const playerStats = {
@@ -18,10 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     };
 
-    // Player colors (you can change these as needed)
-    const playerColors = ["#133f79", "#009879"];  // Blue for Player A, Green for Player B
+    const playerColors = ["#133f79", "#009879"];
 
-    // Create the legend section
+    // create the legend section
     function createLegend() {
         const legendContainer = document.createElement("div");
         legendContainer.className = "legend-container";
@@ -30,12 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
             const legendItem = document.createElement("div");
             legendItem.className = "legend-item";
 
-            // Create the colored box
+            // create the colored box
             const colorBox = document.createElement("div");
             colorBox.className = "color-box";
             colorBox.style.backgroundColor = playerColors[i];
 
-            // Create the player label
+            // create the player label
             const playerLabel = document.createElement("div");
             playerLabel.className = "player-label";
             playerLabel.innerText = players[i];
@@ -48,32 +49,30 @@ document.addEventListener("DOMContentLoaded", function () {
         container.insertBefore(legendContainer, container.firstChild);  // Insert the legend at the top
     }
 
-    // Function to create the bar sections
+    // function to create the bar sections
     function createBarSection(statName, values) {
         const maxValue = Math.max(...values);
 
-        // Create a section for each stat
         const section = document.createElement("div");
         section.className = "bar-section";
 
-        // Create a row for the stat name (left column)
         const statRow = document.createElement("div");
         statRow.className = "stat-row";
 
-        // Stat name (only once)
+        // stat name (only once)
         const statLabel = document.createElement("div");
         statLabel.className = "bar-stat";
         statLabel.innerText = statName;
 
-        // Player names and values column (middle column)
+        // player names and values column (middle column)
         const playerValuesContainer = document.createElement("div");
         playerValuesContainer.className = "player-values-container";
 
-        // Bar visual container (right column)
+        // bar visual container (right column)
         const barVisualContainer = document.createElement("div");
         barVisualContainer.className = "bar-visual-container";
 
-        // Add player names and values + bars to the row
+        // add player names and values + bars to the row
         for (let i = 0; i < values.length; i++) {
             const playerValue = document.createElement("div");
             playerValue.className = "player-value";
@@ -88,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
             barContainer.className = "bar-container";
             barContainer.appendChild(barVisual);
 
-            // Append player data (name + value) and bar visual
+            // append player data (name + value) and bar visual
             playerValuesContainer.appendChild(playerValue);
             barVisualContainer.appendChild(barContainer);
         }
@@ -100,11 +99,55 @@ document.addEventListener("DOMContentLoaded", function () {
         container.appendChild(section);
     }
 
-    // Create the legend at the top of the container
+    // create the legend at the top of the container
     createLegend();
 
-    // Generate bars for each stat
+    // generate bars for each stat
     for (const [statName, values] of Object.entries(playerStats)) {
         createBarSection(statName, values);
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    // modal functionality
+    const modal = document.getElementById("infoModal");
+    const infoText = document.getElementById("infoText");
+    const closeBtn = document.getElementsByClassName("close-btn")[0];
+
+    infoText.onclick = function() {
+        modal.style.display = "block";
+    };
+
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+});
+
+// download the comparison chart
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById('download').addEventListener('click', () => {
+        console.log('clicked')
+
+        const header = document.getElementsByClassName('heading')[1];
+        const originalBorderRadius = window.getComputedStyle(header).borderRadius;
+
+        const title = players[0].replace(/\s+/g, '') + 'Vs' + players[1].replace(/\s+/g, '');
+        
+        header.style.setProperty('border-radius', '0');
+        html2canvas(document.getElementById('chart')).then((canvas) => {
+          header.style.borderRadius = originalBorderRadius;
+          const link = document.createElement('a');
+          link.download = title + '.png';
+          link.href = canvas.toDataURL();
+          link.click();
+        });
+      });
+});
+
+  

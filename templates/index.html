@@ -1,92 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="{{ url_for('static', filename='easynba.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/utils.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/table.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/player_container.css') }}" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
-    <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/awards.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/delete.js') }}"></script>
+{% extends "template.html" %}
 
-
-    <title>Easy NBA</title>
-</head>
-<body>
-    <div id="lottie"></div> <!-- Background Lottie Animation -->
-    <div class="body">
-        <header>
-            <div class="title">Easy-NBA</div>
-            <nav>
-                <ul class="navlist">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('compare') }}">Compare</a></li>
-                    <li><a href="#">Social</a></li>
-                </ul>
-            </nav>
-        </header>
-
-        <main class="gradient">
-            <div class="content center">
-                <h1>Enter an NBA player to start!</h1>
-                <p class="intro">
-                    Please use their common names and include punctuation when necessary.
-                    <br />
-                    Ex: 'Magic Johnson', 'shaQUILLE O'neal' are both valid but...
-                    'Earvin Johnson' and 'shaquille oneal' are not.
-                    <br /><br />
-                    Please allow up to 5 seconds for results :)
-                </p>
-                <form action="/" method="post">
-                    <input type="text" placeholder="Enter player" name="player" required />
-                    <button type="submit">Search</button>
-                </form>
-                {% if reg and playoffs %}
-                {% if player_info %}
-                {% set player = player_info["player_name"] %}
-                <div class="player-container boxify">
-                    <div class="heading">{{player_info["player_name"]}} - Player Info</div>
-                    <div class="sides">
-                        <div class="left">
-                            <img src="{{player_info['img_link']}}" alt="NBA Player" />
-                            <div class="info">
-                                <b>{{player_info["player_name"]}}</b>
-                                <p><b>POS: </b>{{player_info["position"] | join(', ')}}</p>
-                                <p class="max-width"><b>Primary Teams: <br /></b>{{player_info["teams"] | join(', ')}}</p>
-                            </div>
-                                <button class="test-btn" id='delete-btn' data-player-id='{{player_id}}'>Update Stats</button>
-                        </div>
-                        <div class="right">
-                            <div class="awards round" data-awards='{{ player_info["awards"]|tojson|safe }}'>
-                            </div>
-                            <div class="more-info round">
-                                <p>Closest Player in DB: {{closest_player | join(', ')}}</p>
-                            </div>
-                        </div>
+{% block content %}
+    <div class="content center">
+        <h1>Enter an NBA player to start!</h1>
+        <p class="intro">
+            Please use their common names and include punctuation when necessary.
+            <br />
+            Ex: 'Magic Johnson', 'shaQUILLE O'neal' are both valid but...
+            'Earvin Johnson' and 'shaquille oneal' are not.
+            <br /><br />
+            Please allow up to 5 seconds for results :)
+        </p>
+        <form action="/" method="post">
+            <input type="text" placeholder="Enter player" name="player" required />
+            <button type="submit">Search</button>
+        </form>
+        {% if reg and playoffs %}
+        {% if player_info %}
+        {% set player = player_info["player_name"] %}
+        <div class="player-container boxify">
+            <div class="heading">{{ player_info["player_name"] }} - Player Info</div>
+            <div class="sides">
+                <div class="left">
+                    <img src="{{ player_info['img_link'] }}" alt="NBA Player" />
+                    <div class="info">
+                        <b>{{ player_info["player_name"] }}</b>
+                        <p><b>POS: </b>{{ player_info["position"] | join(', ') }}</p>
+                        <p class="max-width"><b>Primary Teams: <br /></b>{{ player_info["teams"] | join(', ') }}</p>
+                    </div>
+                    <button class="test-btn" id='delete-btn' data-player-id='{{ player_id }}'>Update Stats</button>
+                </div>
+                <div class="right">
+                    <div class="awards round" data-awards='{{ player_info["awards"] | tojson | safe }}'></div>
+                    <div class="more-info round">
+                        <p>Closest Player in DB: {{ closest_player | join(', ') }}</p>
                     </div>
                 </div>
-                {% endif %}
-                <div class ="stats-head boxify">
-                    <h2>Regular Season Stats</h2>
-                </div>
-                <div class="scroll center">{{ reg | safe }}</div>
-                <div class ="stats-head boxify">
-                    <h2>Post-Season Stats</h2>
-                </div>
-                <div class="scroll center last">{{ playoffs | safe }}</div>
-                {% else %}
-                <p>player not found, sorry!</p>
-                {% endif %}
             </div>
-        </main>
-
-        <footer>
-            <p>Made by Zohair Syed - Currently in Development</p>
-        </footer>
+        </div>
+        {% endif %}
+        <div class="stats-head boxify">
+            <h2>Regular Season Stats</h2>
+        </div>
+        <div class="scroll center">{{ reg | safe }}</div>
+        <div class="stats-head boxify">
+            <h2>Post-Season Stats</h2>
+        </div>
+        <div class="scroll center last">{{ playoffs | safe }}</div>
+        {% else %}
+        <p>player not found, sorry!</p>
+        {% endif %}
     </div>
-</body>
-</html>
+{% endblock %}

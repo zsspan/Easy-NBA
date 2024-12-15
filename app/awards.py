@@ -91,7 +91,6 @@ def get_awards_list(soup: BeautifulSoup) -> list:
     return awards
 
 def get_priority_awards(awards: list[str]) -> dict:
-    print(awards)
     d = {"Rings": 0, "All-Star": 0, "All-NBA": 0}
     for award in awards:
         if "All Star" in award:

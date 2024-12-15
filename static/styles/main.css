@@ -125,6 +125,7 @@ h3{
 
 .intro{
     padding: 0 4em;
+    max-width: 900px;
 }
 
 .content p {

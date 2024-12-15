@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{{ url_for('static', filename='easynba.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/utils.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/table.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/player_container.css') }}" />
+    
+    {% if request.endpoint == 'compare' %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/compare.css') }}" />
+        <script src="{{ url_for('static', filename='js/stats.js') }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    {% endif %}
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+    <script src="{{ url_for('static', filename='js/lottie.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/awards.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/delete.js') }}"></script>
+    <title>Easy NBA</title>
+</head>
+<body>
+    <div id="lottie"></div> <!-- Background Lottie Animation -->
+    <div class="body">
+        <header>
+            <div class="title">Easy-NBA</div>
+            <nav>
+                <ul class="navlist">
+                    <li><a href="{{ url_for('home')}}">Home</a></li>
+                    <li><a href="{{ url_for('compare')}}">Compare</a></li>
+                    <li><a href="{{ url_for('visualize')}}">Visualize</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="gradient">
+            <!-- this is where content will go -->
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer>
+            <p>Made by Zohair Syed - Currently in Development</p>
+        </footer>
+    </div>
+</body>
+</html>

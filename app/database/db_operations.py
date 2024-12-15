@@ -5,7 +5,7 @@ data.
 """
 
 from .data_retrieval import PlayerInfo
-from ..models.TableModels import db, Player, RegularSeason, PostSeason, PlayerInfo
+from ..models.TableModels import MasterPlayer, db, Player, RegularSeason, PostSeason, PlayerInfo
 import pandas as pd
 
 def add_player(player_query, reg, playoffs, info: dict):
@@ -43,7 +43,8 @@ def add_regular_season_stats(player_id: int, reg) -> None:
             fg_percentage=(reg.iloc[index]['FG%']),  # Parse percentage
             three_point_percentage=(reg.iloc[index]['3P%']),
             ft_percentage=(reg.iloc[index]['FT%']),
-            turnovers=reg.iloc[index]['TOV']
+            turnovers=reg.iloc[index]['TOV'],
+            minutes=(reg.iloc[index]['MP'])
         )
         db.session.add(reg_season_entry)
 
@@ -65,7 +66,9 @@ def add_post_season_stats(player_id: int, playoffs) -> None:
             fg_percentage=(playoffs.iloc[index]['FG%']),  # Parse percentage
             three_point_percentage=(playoffs.iloc[index]['3P%']),
             ft_percentage=(playoffs.iloc[index]['FT%']),
-            turnovers=playoffs.iloc[index]['TOV']
+            turnovers=playoffs.iloc[index]['TOV'],
+            minutes=(playoffs.iloc[index]['MP'])
+
         )
         db.session.add(post_season_entry)
 
@@ -149,7 +152,8 @@ def convert_reg_to_df(reg_query):
             'FG%': season.fg_percentage,
             'FT%': season.ft_percentage,
             '3P%': season.three_point_percentage,
-            'TOV': season.turnovers
+            'TOV': season.turnovers,
+            'MP': season.minutes
         } for season in reg_query]
 
         reg_df = pd.DataFrame(reg_data)
@@ -183,7 +187,8 @@ def convert_post_to_df(playoffs_query):
                 'FG%': playoff.fg_percentage,
                 'FT%': playoff.ft_percentage,
                 '3P%': playoff.three_point_percentage,
-                'TOV': playoff.turnovers
+                'TOV': playoff.turnovers,
+                'MP': playoff.minutes
                  # currently set to None for incomplete data, fix later
             } for playoff in playoffs_query]
 
@@ -205,6 +210,7 @@ def convert_post_to_df(playoffs_query):
     
 def get_player_info(player_query: str) -> dict:
     query = Player.query.filter_by(name=player_query).first()
+    
     player_info_dict = {}
 
     if query:
@@ -238,6 +244,7 @@ def delete_player_from_id(player_id: int) -> bool:
         PlayerInfo.query.filter_by(player_id=player_id).delete()
         RegularSeason.query.filter_by(player_id=player_id).delete()
         PostSeason.query.filter_by(player_id=player_id).delete()
+        MasterPlayer.query.filter_by(player_id=player_id).delete()
         player = Player.query.filter_by(id=player_id).delete()
         
         db.session.commit()
@@ -254,3 +261,67 @@ def delete_player_from_id(player_id: int) -> bool:
         print(f"Error deleting player data: {e}")
         return False
 
+def get_position(id) -> list[str]:
+    info = PlayerInfo.query.filter_by(player_id=id).first()
+    if info:
+        return info.positions.split(', ')[0]
+    return None
+
+def update_master_player(player_id, reg_stats):
+    pos_mapping = {'PG': 1, 'SG': 2, 'SF': 3, 'PF': 4, 'C': 5}
+    
+    reg_stats = reg_stats[reg_stats['Season']=='Career']
+    reg_stats_row = reg_stats.iloc[0]
+    pos_str = get_position(player_id)
+    pos_num = pos_mapping[pos_str]
+
+    master_player = MasterPlayer.query.filter_by(player_id=player_id).first()
+    
+    # update the existing entry with the new stats
+    if master_player:
+        master_player.games = int(reg_stats_row['G'])
+        master_player.pos = pos_num
+        master_player.points = reg_stats_row['PTS']
+        master_player.rebounds = reg_stats_row['TRB']
+        master_player.assists = reg_stats_row['AST']
+        master_player.steals = reg_stats_row['STL']
+        master_player.blocks = reg_stats_row['BLK']
+        master_player.turnovers = reg_stats_row['TOV']
+        master_player.fg_percentage = reg_stats_row['FG%']
+        master_player.three_point_percentage = reg_stats_row['3P%']
+        master_player.free_throw_percentage = reg_stats_row['FT%']
+        master_player.minutes = reg_stats_row['MP']
+
+        print("updated master table")
+        db.session.commit()
+    
+    else:
+        # if no entry exists, create a new one
+        new_master_player = MasterPlayer(
+            player_id=player_id,
+            games=int(reg_stats_row['G']),
+            pos=pos_num,
+            points=reg_stats_row['PTS'],
+            rebounds=reg_stats_row['TRB'],
+            assists=reg_stats_row['AST'],
+            steals=reg_stats_row['STL'],
+            blocks=reg_stats_row['BLK'],
+            turnovers=reg_stats_row['TOV'],
+            fg_percentage=reg_stats_row['FG%'],
+            three_point_percentage=reg_stats_row['3P%'],
+            free_throw_percentage=reg_stats_row['FT%'],
+            minutes=reg_stats_row['MP']
+        )
+        print("appended to master table")
+
+        db.session.add(new_master_player)
+        db.session.commit()
+
+def query_all_master_table():
+    """Queries all players from the master table"""
+    try:
+        master_all = MasterPlayer.query.all()
+        return master_all
+    except Exception as e:
+        print("Error retrieving all players:", e)
+        return None

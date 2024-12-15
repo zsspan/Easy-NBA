@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 
 def convert_type(df: pd.DataFrame) -> pd.DataFrame:
     # define the numerical columns you want to convert
-    numerical_columns = ["G", "PTS", "TRB", "AST", "STL", "BLK", "FG%", "FT%", "3P%", "TOV"]
+    numerical_columns = ["G", "PTS", "TRB", "AST", "STL", "BLK", "FG%", "FT%", "3P%", "TOV", 'MP']
     # df = df.copy()
     
     for col in numerical_columns:
@@ -54,7 +54,7 @@ def clean_table(df: pd.DataFrame) -> pd.DataFrame:
         return df # must fix later
     
     df = convert_type(df)
-    columns_to_drop = ['Age', 'Lg', 'GS','MP', 'FGA', 'FG', '3P', '3PA', '2P', '2PA', '2P%', 
+    columns_to_drop = ['Age', 'Lg', 'GS', 'FGA', 'FG', '3P', '3PA', '2P', '2PA', '2P%', 
                    'eFG%', 'FT', 'FTA', 'ORB', 'DRB', 'PF', 'Awards']
 
     existing_columns_to_drop = [col for col in columns_to_drop if col in df.columns]
@@ -78,7 +78,7 @@ def front_end_clean(df: pd.DataFrame) -> pd.DataFrame:
     
     df.replace({"-1": '-', -1: '-'}, inplace=True)
 
-    columns_to_drop = ['TOV', 'FT%', '3P%']
+    columns_to_drop = ['TOV', 'FT%', '3P%', 'MP']
     
     # drop extra stats in the df
     for col in columns_to_drop:

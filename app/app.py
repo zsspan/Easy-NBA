@@ -68,18 +68,28 @@ def delete_player():
 def compare():
     player1_info, player2_info, player1_stats, player2_stats = {}, {}, {}, {}
     comp_df1, comp_df2 = None, None
+    score = 0
 
     if request.method == "POST":
         player1 = request.form.get('player1')
         player2 = request.form.get('player2')
 
-        player1_info, player2_info, comp_df1, comp_df2 = handle_comparison(player1, player2)
+        player1_info, player2_info, comp_df1, comp_df2, score = handle_comparison(player1, player2)
         player1_stats, player2_stats = handle_comp_dict(comp_df1, comp_df2) # change to handler later
 
     return render_template("compare.html",
+                           score=score,
                            player1_info=player1_info,
                            player2_info=player2_info,
                            player1_stats=player1_stats,
                            player2_stats=player2_stats,
                            df1=comp_df1.to_html(classes="data") if comp_df1 is not None else None,
                            df2=comp_df2.to_html(classes="data") if comp_df2 is not None else None)
+
+
+@app.route('/visualize')
+def visualize():
+    return render_template('visualize.html')
+
+with app.app_context():
+    db.create_all()
