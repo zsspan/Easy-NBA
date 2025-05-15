@@ -1,0 +1,13 @@
+name: Background job to keep Aiven MySQL and Render hosting active
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call renderbg endpoint
+        run: curl -s https://easy-nba.onrender.com/renderbg

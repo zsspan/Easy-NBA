@@ -12,6 +12,7 @@ from flask_migrate import Migrate
 # asbtraction
 from .handler import handle_closest_player, handle_comp_dict, handle_comparison, handle_deletion_status, handle_kmeans, handle_player_data
 from .models.TableModels import db
+from sqlalchemy import text
 
 
 pymysql.install_as_MySQLdb()
@@ -115,6 +116,17 @@ def visualize():
         closest_players=closest_players,
         cluster=cluster,
     )
+
+
+@app.route("/renderbg")
+def renderbg():
+    try:
+        db.session.execute(text("SELECT 1"))
+        print("DB and site dpeloyment timer reset")
+        return redirect(url_for("home"))
+    except Exception as e:
+        return str(e), 500
+
 
 
 with app.app_context():
